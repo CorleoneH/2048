@@ -40,30 +40,52 @@ def right(grid):
 class Game:
     grid = []
     controls = ['w', 'a', 's', 'd']
+    def __init__(self, win_goal):
+        self.win_goal = win_goal
+        self.cur_goal = 0
+
+    def set_win_goal(self):
+        self.clean_screen()
+        self.win_goal = int(input("Input your win goal: "))
+
+    def get_cur_goal(self):
+        self.cur_goal = max(max(row) for row in self.grid)
 
     def rnd_field(self):
         number = random.choice([4, 2, 4, 2, 4, 2, 4, 2, 4, 2])
         x, y = random.choice([(x, y) for x, y in itertools.product([0, 1, 2, 3], [0, 1, 2, 3]) if self.grid[x][y] == 0])
         self.grid[x][y] = number
 
+    # clean screen for display in same place
+    def clean_screen(self):
+        if "windows" in platform.system().lower():
+            os.system("cls")
+        elif "linux" in platform.system().lower():
+            os.system("clear")
 
     def print_screen(self):
-        if platform.system() == "Windows":
-            os.system("cls")
-        elif platform.system() == "Linux":
-            os.system('clear')
+        self.clean_screen()
+        
+        # get CURRENT GOAL before displaying
+        self.get_cur_goal()
+        
+        # print game info, including WIN GOAL and CURRENT GOAL
+        print("WIN GOAL: {}\t\tCURRENT GOAL: {}\n\n".format(self.win_goal, self.cur_goal))
+
+        # -------------- print game main zone [start]---------------------------
         print("-" * 21)
 
         for row in self.grid:
             print("|{}|".format('|'.join([str(col or ' ').center(4) for col in row])))
             print("-" * 21)
+        # --------------- print game main zone [end]----------------------------
 
     def logic(self, control):
         grid = {'w' : up, 's' : down, 'a' : left, 'd' : right}[control]([[c for c in r] for r in self.grid])
         if grid != self.grid:
             del self.grid[:]
             self.grid.extend(grid)
-            if [n for n in itertools.chain(*grid) if n >= 64]:
+            if [n for n in itertools.chain(*grid) if n >= self.win_goal]:
                 return 1, "WIN!!!"
             self.rnd_field()
             self.print_screen()
@@ -76,6 +98,9 @@ class Game:
     def main_loop(self):
         del self.grid[:]
         self.grid.extend([[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]])
+        
+        # set WIN GOAL in every beginning of game
+        self.set_win_goal()
 
         self.rnd_field()
         self.rnd_field()
@@ -87,6 +112,7 @@ class Game:
                 status, info = self.logic(control)
                 # win or lose
                 if status:
+                    self. print_screen()
                     print(info)
                     if input("Start another game?[Y/y]").lower() == 'y':
                         break
@@ -97,4 +123,4 @@ class Game:
 
 
 if __name__ == "__main__":
-    Game().main_loop()
+    Game(32).main_loop()
