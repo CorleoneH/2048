@@ -53,8 +53,10 @@ class Game:
         self.clean_screen()
         while True:
             win_goal = input("Input your win goal[Enter to default:32]: ")
+            # Press enter to start the game directly with default
             if len(win_goal) == 0:
                 break
+            # Handing int exception if no valid number
             try:
                 self.win_goal = int(win_goal)
                 break
@@ -94,7 +96,7 @@ class Game:
         # --------------- print game main zone [end]----------------------------
 
     def logic(self, control):
-        grid = {'w' : self.up, 's' : self.down, 'a' : self.left, 'd' : self.right}[control]([[c for c in r] for r in self.grid])
+        grid = {'w' : Game.up, 's' : Game.down, 'a' : Game.left, 'd' : Game.right}[control]([[c for c in r] for r in self.grid])
         if grid != self.grid:
             del self.grid[:]
             self.grid.extend(grid)
@@ -103,7 +105,7 @@ class Game:
             self.rnd_field()
             self.print_screen()
         else:
-            if not [1 for g in [f(grid) for f in [self.up, self.down, self.left, self.right]] if g != self.grid]:
+            if not [1 for g in [f(grid) for f in [Game.up, Game.down, Game.left, Game.right]] if g != self.grid]:
                 return -1, "Game Over!!!"
 
         return 0, ''    # return 0 if continue; return 1 if "Win", return -1 if "Game Over"
